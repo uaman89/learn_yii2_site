@@ -18,6 +18,11 @@ use Yii;
  */
 class User extends \yii\db\ActiveRecord
 {
+
+    const STATUS_ON_ACTIVE = 10;
+    const STATUS_ON_NOT_ACTIVE = 1;
+    const STATUS_ON_DELETED = 0;
+
     /**
      * @inheritdoc
      */
@@ -32,10 +37,15 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['username', 'email', 'password_hash', 'status', 'auth_key', 'create_at', 'update_at'], 'required'],
+
+            [['username', 'email', 'password'], 'filter', 'filter'=>'trim'],
+            [['username', 'email', 'status'], 'required'],
+            ['email','email'],
             [['status', 'create_at', 'update_at'], 'integer'],
-            [['username', 'email', 'password_hash'], 'string', 'max' => 255],
-            [['auth_key'], 'string', 'max' => 32]
+            ['username', 'string', 'min'=> 2, 'max' => 255],
+            ['password', 'required', 'on' => 'create' ],
+            ['username', 'unique', 'message' => 'this name is already used'],
+            ['email', 'unique', 'message' => 'this email is already used']
         ];
     }
 
@@ -48,7 +58,7 @@ class User extends \yii\db\ActiveRecord
             'id' => 'ID',
             'username' => 'Username',
             'email' => 'Email',
-            'password_hash' => 'Password Hash',
+            'password' => 'Password',
             'status' => 'Status',
             'auth_key' => 'Auth Key',
             'create_at' => 'Create At',
