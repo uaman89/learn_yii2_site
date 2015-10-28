@@ -25,12 +25,21 @@ class MainController extends \yii\web\Controller
 
     function actionReg(){
 
-        if ( Yii::$app->request->post() ){
-            var_dump( Yii::$app->request->post() );
-            Yii::$app->end();
+        $model = new RegForm();
+
+        if ( $model->load( Yii::$app->request->post() ) /*&& $model->validate()*/){
+            $res = $model->reg();
+            if ( $res ){
+                return $this->goHome();
+            }
+            else{
+
+                Yii::$app->session->setFlash('error','Here is an error');
+                Yii::error('error on reg');
+                $this->refresh();
+            }
         }
 
-        $model = new RegForm();
 
         return $this->render(
             'reg',
@@ -43,6 +52,10 @@ class MainController extends \yii\web\Controller
     function actionLogin(){
 
         $model = new LoginForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->login()){
+            return $this->goBack();
+        }
 
         return $this->render(
             'login',

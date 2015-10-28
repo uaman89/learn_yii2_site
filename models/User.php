@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-
+use yii\web\IdentityInterface;
 /**
  * This is the model class for table "user".
  *
@@ -16,7 +16,7 @@ use Yii;
  * @property integer $create_at
  * @property integer $update_at
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
 
     const STATUS_ON_ACTIVE = 10;
@@ -65,4 +65,35 @@ class User extends \yii\db\ActiveRecord
             'update_at' => 'Update At',
         ];
     }
+
+/*auth methods*/
+    public static function findIdentity($id)
+    {
+        return static::findOne(
+            ['id'=>$id, 'staus'=>self::STATUS_ON_ACTIVE]
+        );
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['access_token' => $token]);
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+        return $this->auth_key;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        return $this->auth_key === $authKey;
+    }
+
+
+
 }

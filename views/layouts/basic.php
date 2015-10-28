@@ -17,6 +17,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\Modal;
+use app\components\AlertWidget;
 
 AppAsset::register($this);
 $this->beginPage();
@@ -142,7 +143,7 @@ $this->beginPage();
 
         NavBar::end();
         ?>
-
+        <?= AlertWidget::widget(); ?>
         <div class="container">
             <?= $content ?>
         </div>

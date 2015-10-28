@@ -17,11 +17,26 @@ class RegForm extends Model
     public $username;
     public $email;
     public $password;
+    public $status;
 
     public function rules()
     {
         return [
-            [['username', 'email', 'password'], 'required']
+            [['username', 'email', 'password'], 'filter', 'filter'=>'trim'],
+            [['username', 'email', 'password'], 'required'],
+            ['username', 'string', 'min'=>2, 'max' => 255],
+//            ['username', 'unique',
+//                'targetClass' => User::className(),
+//                'message' => 'this user name is already used'],
+            ['email', 'email'],
+//            ['email', 'unique',
+//                'targetClass' => User::className(),
+//                'message' => 'this email name is already used'],
+            [ 'status', 'default',  'value'=>User::STATUS_ON_ACTIVE, 'on'=>'default'],
+            [ 'status', 'in', 'range' => [
+                User::STATUS_ON_NOT_ACTIVE,
+                User::STATUS_ON_DELETED
+            ]]
         ];
     }
 
@@ -32,5 +47,9 @@ class RegForm extends Model
             'email' => 'Ел. пошта',
             'password' => 'пароль'
         ];
+    }
+
+    public  function reg(){
+        return true;
     }
 }

@@ -13,7 +13,8 @@ use yii\widgets\ActiveForm;
 
         <?= $form->field($model, 'username') ?>
         <?= $form->field($model, 'password')->passwordInput() ?>
-    
+        <?= $form->field($model, 'rememberMe')->checkbox() ?>
+
         <div class="form-group">
             <?= Html::submitButton('Увійти', ['class' => 'btn btn-primary']) ?>
         </div>
