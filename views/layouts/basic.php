@@ -29,6 +29,7 @@ $this->beginPage();
 <head>
     <meta charset="<?= Yii::$app->charset; ?>">
     <?php $this->registerMetaTag(['name'=>'viewport', 'content'=>'width=device-width, initial-scale=1']); ?>
+    <?= Html::csrfMetaTags() ?>
     <title><?= Yii::$app->name; ?></title>
     <? $this->head(); ?>
 </head>
@@ -44,53 +45,63 @@ $this->beginPage();
             ]
         );
 
+            $menuItems = [
+                [
+                    'label'=>'Головна <span class="glyphicon glyphicon-home"></span>',
+                    'url'=>['/main/index']
+                ],
+                /*
+                '<li>
+                    <a data-toggle="modal" data-target="#firstModalWindow">
+                        перший перемкач
+                    </a>
+                </li>',
+                */
+                [
+                    'label' => 'другий перемикач <span class="glyphicon glyphicon-question-sign">',
+                    'url' => ['#'],
+                    'linkOptions'=>[
+                        'data-toggle' => 'modal',
+                        'data-target' => '#firstModalWindow',
+                        'style' => 'cursor:pointer; outline: none;'
+                    ]
+                ],
 
+                [
+                    'label'=>'тут виадаючий список <span class="glyphicon glyphicon-inbox ">',
+                    'items'=> [
+                        '<li class="dropdown-header">Розширення</li>',
+                        '<li class="divider"></li>',
+                        [
+                            'label'=>'переглянути',
+                            'url'=>['/widget-test/index']
+                        ]
+
+                    ]
+                ],
+
+            ];
+
+            if (Yii::$app->user->isGuest){
+                $menuItems[] = [
+                    'label' => 'Реєстрація',
+                    'url' => ['/main/reg']
+                ];
+                $menuItems[] = [
+                    'label' => 'Залогінитись',
+                    'url' => ['/main/login']
+                ];
+            }
+            else{
+                $menuItems[] = [
+                    'label' => 'Вийти( '.Yii::$app->user->identity['username'].' )',
+                    'url' => ['/main/logout'],
+                    'linkOption' => ['data-method'=>'post']
+                ];
+            }
 
             echo Nav::widget([
-                'items'=>[
-                    [
-                        'label'=>'Головна <span class="glyphicon glyphicon-home"></span>',
-                        'url'=>['main/index']
-                    ],
-                    /*
-                    '<li>
-                        <a data-toggle="modal" data-target="#firstModalWindow">
-                            перший перемкач
-                        </a>
-                    </li>',
-                    */
-                    [
-                        'label' => 'другий перемикач <span class="glyphicon glyphicon-question-sign">',
-                        'url' => ['#'],
-                        'linkOptions'=>[
-                            'data-toggle' => 'modal',
-                            'data-target' => '#firstModalWindow',
-                            'style' => 'cursor:pointer; outline: none;'
-                        ]
-                    ],
-
-                    [
-                        'label'=>'тут виадаючий список <span class="glyphicon glyphicon-inbox ">',
-                        'items'=> [
-                            '<li class="dropdown-header">Розширення</li>',
-                            '<li class="divider"></li>',
-                            [
-                                'label'=>'переглянути',
-                                'url'=>['widget-test/index']
-                            ]
-
-                        ]
-                    ],
-                    [
-                        'label' => 'Залогінитись',
-                        'url' => ['main/login']
-                    ],
-                    [
-                        'label' => 'Реєстрація',
-                        'url' => ['main/reg']
-                    ],
-
-                ],
+                'items'=> $menuItems,
                 'encodeLabels' => false,
                 'options' => [
                     'class' => 'navbar-nav navbar-right'

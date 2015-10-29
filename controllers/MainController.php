@@ -3,6 +3,7 @@
 namespace app\controllers;
 use app\models\RegForm;
 use app\models\LoginForm;
+use app\models\User;
 use Yii;
 
 class MainController extends \yii\web\Controller
@@ -27,10 +28,11 @@ class MainController extends \yii\web\Controller
 
         $model = new RegForm();
 
-        if ( $model->load( Yii::$app->request->post() ) /*&& $model->validate()*/){
-            $res = $model->reg();
-            if ( $res ){
-                return $this->goHome();
+        if ( $model->load( Yii::$app->request->post() ) && $model->validate() ){
+            if ($user = $model->reg() ){
+                if ( $user->status === User::STATUS_ON_ACTIVE)
+                    if ( Yii::$app->getUser()->login($user))
+                        return $this->goHome();
             }
             else{
 
@@ -39,6 +41,8 @@ class MainController extends \yii\web\Controller
                 $this->refresh();
             }
         }
+        else Yii::$app->session->setFlash('error','load or validation fail');
+
 
 
         return $this->render(

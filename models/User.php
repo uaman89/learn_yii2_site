@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\web\IdentityInterface;
+use yii\behaviors\TimestampBehavior;
 /**
  * This is the model class for table "user".
  *
@@ -38,16 +39,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
 
-            [['username', 'email', 'password'], 'filter', 'filter'=>'trim'],
+            [['username', 'email', 'password_hash'], 'filter', 'filter'=>'trim'],
             [['username', 'email', 'status'], 'required'],
             ['email','email'],
-            [['status', 'create_at', 'update_at'], 'integer'],
+            [['status', 'created_at', 'updated_at'], 'integer'],
             ['username', 'string', 'min'=> 2, 'max' => 255],
-            ['password', 'required', 'on' => 'create' ],
+            ['password_hash', 'required', 'on' => 'create' ],
             ['username', 'unique', 'message' => 'this name is already used'],
             ['email', 'unique', 'message' => 'this email is already used']
         ];
     }
+
+
 
     /**
      * @inheritdoc
@@ -61,16 +64,29 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'password' => 'Password',
             'status' => 'Status',
             'auth_key' => 'Auth Key',
-            'create_at' => 'Create At',
-            'update_at' => 'Update At',
+            'created_at' => 'Create At',
+            'updated_at' => 'Update At',
         ];
     }
 
-/*auth methods*/
+    public function behaviors(){
+        return [
+            TimestampBehavior::className()
+        ];
+    }
+
+    public function findUserByName($username){
+        return static::findOne([
+            'username' => $username
+        ]);
+    }
+
+
+    /*auth methods*/
     public static function findIdentity($id)
     {
         return static::findOne(
-            ['id'=>$id, 'staus'=>self::STATUS_ON_ACTIVE]
+            ['id'=>$id, 'status'=>self::STATUS_ON_ACTIVE]
         );
     }
 
@@ -94,6 +110,16 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->auth_key === $authKey;
     }
 
+    //helpers
+    public function setPassword($password){
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+    }
 
+    public function generateAuthKey(){
+        $this->auth_key = Yii::$app->security->generateRandomString();
+    }
 
+    public function validatePassword($password){
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
+    }
 }

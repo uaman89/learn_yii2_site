@@ -36,7 +36,7 @@ class LoginForm extends Model{
                 $this->addError($attribute, 'Wrong password');
             }
         }
-        else Yii::$app->session->setFlash('hasErrors');
+        else Yii::$app->session->setFlash('hasErrors on validate password');
     }
 
     function attributeLabels(){

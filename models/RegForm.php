@@ -25,15 +25,17 @@ class RegForm extends Model
             [['username', 'email', 'password'], 'filter', 'filter'=>'trim'],
             [['username', 'email', 'password'], 'required'],
             ['username', 'string', 'min'=>2, 'max' => 255],
-//            ['username', 'unique',
-//                'targetClass' => User::className(),
-//                'message' => 'this user name is already used'],
+            ['password', 'string', 'min'=>6, 'max' => 255],
+            ['username', 'unique',
+                'targetClass' => User::className(),
+                'message' => 'this user name is already used'],
             ['email', 'email'],
-//            ['email', 'unique',
-//                'targetClass' => User::className(),
-//                'message' => 'this email name is already used'],
+            ['email', 'unique',
+                'targetClass' => User::className(),
+                'message' => 'this email name is already used'],
             [ 'status', 'default',  'value'=>User::STATUS_ON_ACTIVE, 'on'=>'default'],
             [ 'status', 'in', 'range' => [
+                User::STATUS_ON_ACTIVE,
                 User::STATUS_ON_NOT_ACTIVE,
                 User::STATUS_ON_DELETED
             ]]
@@ -50,6 +52,13 @@ class RegForm extends Model
     }
 
     public  function reg(){
-        return true;
+        $user = new User();
+        $user->username = $this->username;
+        $user->email = $this->email;
+        $user->status = $this->status;
+        $user->setPassword($this->password);
+        $user->generateAuthKey();
+        //var_dump($user);exit;
+        return $user->save() ? $user : null;
     }
 }
